@@ -1,22 +1,17 @@
 FROM golang:1.24.4 as builder
-RUN go install -v github.com/owasp-amass/amass/v4/...@master
-RUN go install -v github.com/tomnomnom/anew@latest
-RUN go install -v github.com/tomnomnom/assetfinder@latest
-RUN go install -v github.com/tomnomnom/httprobe@latest
-RUN go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-RUN go install -v github.com/tomnomnom/fff@latest
-RUN go install -v github.com/jaeles-project/gospider@latest
-RUN go install -v github.com/ffuf/ffuf/v2@latest
+RUN go install -v github.com/owasp-amass/amass/v4/...@master && \
+	 	go install -v github.com/tomnomnom/anew@latest && \
+	 	go install -v github.com/tomnomnom/assetfinder@latest && \
+	 	go install -v github.com/tomnomnom/httprobe@latest && \
+	 	go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest && \
+		go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest && \
+		go install -v github.com/projectdiscovery/katana/cmd/katana@latest && \
+	 	go install -v github.com/tomnomnom/fff@latest && \
+	 	go install -v github.com/jaeles-project/gospider@latest && \
+	 	go install -v github.com/ffuf/ffuf/v2@latest
 
 FROM ubuntu:24.04
-COPY --from=builder go/bin/amass /usr/bin/amass
-COPY --from=builder go/bin/anew /usr/bin/anew
-COPY --from=builder go/bin/assetfinder /usr/bin/assetfinder
-COPY --from=builder go/bin/httprobe /usr/bin/httprobe
-COPY --from=builder go/bin/httpx /usr/bin/httpx
-COPY --from=builder go/bin/fff /usr/bin/fff
-COPY --from=builder go/bin/gospider /usr/bin/gospider
-COPY --from=builder go/bin/ffuf /usr/bin/ffuf
+COPY --from=builder go/bin /usr/bin
 
 RUN apt update
 ENV DEBIAN_FRONTEND noninteractive
