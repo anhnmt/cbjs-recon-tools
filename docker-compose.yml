@@ -1,6 +1,7 @@
 version: "3.6"
 services:
   recon-tools:
+    container_name: recon-tools
     build: .
     ports:
       - '9999:9999'
