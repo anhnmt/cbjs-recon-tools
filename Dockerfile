@@ -1,4 +1,4 @@
-FROM golang:1.24.4 AS builder
+FROM golang:1.24 AS builder
 
 ENV GO111MODULE=on \
     GOBIN=/go/bin
@@ -18,7 +18,8 @@ FROM ubuntu:24.04
 COPY --from=builder /go/bin /usr/bin
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    VERSION=1.4.3
+    AQUATONE_VERSION=1.7.0 \
+    METABIGOR_VERSION=2.0.0
 
 RUN apt update && \
 		apt install -y python3 python3-pip dnsutils nmap wget unzip curl && \
@@ -39,17 +40,22 @@ RUN git clone https://github.com/scheib/chromium-latest-linux && \
     cd chromium-latest-linux && ./update.sh && \
     ln -s /opt/chromium/chromium-latest-linux/latest/chrome /usr/bin/chromium
 
-# install aquatone binary
+# Aquatone
 WORKDIR /opt/aquatone
-RUN wget https://github.com/michenriksen/aquatone/releases/download/v${VERSION}/aquatone_linux_amd64_${VERSION}.zip && \
-    unzip aquatone_linux_amd64_${VERSION}.zip && \
-    cp aquatone /usr/bin
+RUN wget https://github.com/michenriksen/aquatone/releases/download/v${AQUATONE_VERSION}/aquatone_linux_amd64_${AQUATONE_VERSION}.zip && \
+    unzip aquatone_linux_amd64_${AQUATONE_VERSION}.zip && \
+    mv aquatone /usr/bin && rm -rf *.zip
 
-# install cargo and rustscan, metabigor
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
-		/bin/bash -c 'source "$HOME/.cargo/env" && cargo install rustscan' && \
-		wget https://github.com/j3ssie/metabigor/releases/download/v2.0.0/metabigor_v2.0.0_linux_amd64.tar.gz && \
-		tar -xvf metabigor_v2.0.0_linux_amd64.tar.gz && mv metabigor /usr/bin
+# Rustscan + Metabigor
+ENV CARGO_HOME=/usr/local/cargo \
+    RUSTUP_HOME=/usr/local/rustup \
+    PATH=$PATH:/usr/local/cargo/bin
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal && \
+    cargo install rustscan && \
+    wget https://github.com/j3ssie/metabigor/releases/download/v${METABIGOR_VERSION}/metabigor_v${METABIGOR_VERSION}_linux_amd64.tar.gz && \
+    tar -xvf metabigor_v${METABIGOR_VERSION}_linux_amd64.tar.gz && \
+    mv metabigor /usr/bin && \
+    rm -rf metabigor* $CARGO_HOME/registry $CARGO_HOME/git $RUSTUP_HOME
 
 RUN apt install -y nano time openssh-server && \
 		mkdir -p /var/run/sshd && \
