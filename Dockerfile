@@ -36,8 +36,7 @@ RUN apt-get install -yq libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 
     ca-certificates fonts-liberation libnss3 lsb-release xdg-utils wget
 
 RUN git clone https://github.com/scheib/chromium-latest-linux && \
-    cd chromium-latest-linux && \
-    ./update.sh && \
+    cd chromium-latest-linux && ./update.sh && \
     ln -s /opt/chromium/chromium-latest-linux/latest/chrome /usr/bin/chromium
 
 # install aquatone binary
@@ -57,7 +56,7 @@ RUN apt install -y nano time openssh-server && \
 # authorize SSH connection with root account
 		echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config && \
 # change password root
-		echo "root:recon_cbjslab"|chpasswd && \
+		echo "root:recon_cbjslab"|chpasswd
 # RUN service ssh restart
 
 RUN mkdir /root/wordlists
